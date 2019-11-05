@@ -21,12 +21,12 @@ functions:
     timeout: 10
     memorySize: 256
     events:
-      # - schedule: # start
-      #     name: schedule_start-instances
-      #     rate: cron(00 11 * * MON-FRI *) # 08h timezone brazil
-      #     enabled: true
-      #     input:
-      #       start: true
+      - schedule: # start
+          name: schedule_start-instances
+          rate: cron(00 11 * * MON-FRI *) # 08h timezone brazil
+          enabled: true
+          input:
+            start: true
       - schedule: # stop
           name: schedule_stop-instances
           rate: cron(00 22 * * ? *) # 19h timezone brazil
