@@ -1,0 +1,51 @@
+service: infrastructure-stop-start-instances
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  region: ${env:REGION}
+  stage: v1
+  deploymentBucket: ${env:DEPLOYMENT_BUCKET}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - ec2:Start*
+        - ec2:Stop*
+      Resource: "*"
+
+functions:
+  startOrStop:
+    name: ${self:service}_${self:provider.stage}
+    handler: src/handler.startOrStop
+    description: Function to stop or start instances EC2
+    timeout: 10
+    memorySize: 256
+    events:
+      # - schedule: # start
+      #     name: schedule_start-instances
+      #     rate: cron(00 11 * * MON-FRI *) # 08h timezone brazil
+      #     enabled: true
+      #     input:
+      #       start: true
+      - schedule: # stop
+          name: schedule_stop-instances
+          rate: cron(00 22 * * ? *) # 19h timezone brazil
+          enabled: true
+          input:
+            start: false
+    environment:
+      INSTANCE_IDS: ${env:INSTANCE_IDS}
+
+resources:
+  Resources:
+    StartOrStopLogGroup:
+      Properties:
+        RetentionInDays: 7
+
+package:
+ excludeDevDependencies: true
+ exclude:
+   - .git/**
+   - .vscode/**
+   - deploy.sh
+   - README.md
